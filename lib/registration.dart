@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:cyra_ecommerce/constants.dart';
 import 'package:cyra_ecommerce/login.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({super.key});
@@ -12,10 +14,36 @@ class RegistrationPage extends StatefulWidget {
 }
 
 class _RegistrationPageState extends State<RegistrationPage> {
-  String? name, phone, address, username, password;
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
+  String? name, phone, address, username, password;
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+  registration(String name, phone, address, username, password) async {
+   dynamic result;
+    final Map loginData = <String, dynamic>{
+      'name': name,
+      'phone': phone,
+      'address': address,
+      'username': username,
+      'password': password,
+    };
+    final response = await http.post(
+      Uri.parse(' '),
+      body: loginData,
+    );
+    if (response.statusCode == 200) {
+      if (response.body.contains('succuss')) {
+        log('registration successfully completed');
+      } else {
+        log('registration failed');
+      }
+    } else {
+      result = {log(json.decode(response.body)["error"].toString())};
+    }
+    return result;
+  }
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -31,7 +59,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
             const Text('Complete your details  \n'),
             const SizedBox(height: 20),
             Form(
-              key: _formKey,
+              key: formKey,
               child: Column(
                 children: [
                   Padding(
@@ -82,6 +110,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                             decoration: const InputDecoration.collapsed(
                               hintText: 'Phone',
                             ),
+                            keyboardType: TextInputType.phone,
                             onChanged: (value) {
                               setState(() {
                                 phone = value;
@@ -90,6 +119,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                             validator: (value) {
                               if (value!.isEmpty) {
                                 return 'Enter your Phone';
+                              } else if (value.length != 10) {
+                                return 'Please enter a valid number';
                               }
                               return null;
                             },
@@ -210,13 +241,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
                           backgroundColor: mainColor,
                         ),
                         onPressed: () {
-                          if (_formKey.currentState!.validate()) {
+                          if (formKey.currentState!.validate()) {
                             log('name = $name');
                             log('phone = $phone');
                             log('address = $address');
                             log('username = $username');
                             log('password = $password');
                           }
+                          registration(name!, phone, address, username, password);
                         },
                         child: const Text(
                           'Register',
