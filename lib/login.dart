@@ -1,8 +1,14 @@
+import 'dart:convert';
 import 'dart:developer';
 
+import 'package:cyra_ecommerce/api.dart';
 import 'package:cyra_ecommerce/constants.dart';
+import 'package:cyra_ecommerce/pages/home.dart';
 import 'package:cyra_ecommerce/registration.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:http/http.dart' as http;
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -15,6 +21,49 @@ class _LoginPageState extends State<LoginPage> {
   String? username, password;
   bool isProcessing = false;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    _loadCounter();
+    super.initState();
+  }
+
+  _loadCounter() async {
+    final pref = await SharedPreferences.getInstance();
+    bool isLoggedIn = pref.getBool('isLoggedIn') ?? false;
+    if (isLoggedIn && context.mounted) {
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => const HomePage(),
+      ));
+    }
+  }
+
+  login(String username, password) async {
+    dynamic result;
+    final Map loginData = <String, dynamic>{
+      'username': username,
+      'password': password,
+    };
+    final response = await http.post(
+      Uri.parse(Apis.login),
+      body: loginData,
+    );
+    if (response.statusCode == 200) {
+      final pref = await SharedPreferences.getInstance();
+      if (response.body.contains('success') && context.mounted) {
+        pref.setBool('isLoggedIn', true);
+        pref.setString('username', username);
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => const HomePage(),
+        ));
+      } else {
+        log('Login failed');
+      }
+    } else {
+      result = {log(json.decode(response.body)["error"].toString())};
+    }
+    return result;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -127,6 +176,8 @@ class _LoginPageState extends State<LoginPage> {
                               if (_formKey.currentState!.validate()) {
                                 log('username = $username');
                                 log('password = $password');
+                                
+                                login(username!, password);
                               }
                             },
                             child: const Text(

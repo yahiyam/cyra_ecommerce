@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:cyra_ecommerce/api.dart';
 import 'package:cyra_ecommerce/constants.dart';
 import 'package:cyra_ecommerce/login.dart';
+import 'package:cyra_ecommerce/pages/home.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({super.key});
@@ -14,36 +17,40 @@ class RegistrationPage extends StatefulWidget {
 }
 
 class _RegistrationPageState extends State<RegistrationPage> {
-
   @override
   Widget build(BuildContext context) {
-  String? name, phone, address, username, password;
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+    String? name, phone, address, username, password;
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  registration(String name, phone, address, username, password) async {
-   dynamic result;
-    final Map loginData = <String, dynamic>{
-      'name': name,
-      'phone': phone,
-      'address': address,
-      'username': username,
-      'password': password,
-    };
-    final response = await http.post(
-      Uri.parse(' '),
-      body: loginData,
-    );
-    if (response.statusCode == 200) {
-      if (response.body.contains('succuss')) {
-        log('registration successfully completed');
+    register(String name, phone, address, username, password) async {
+      dynamic result;
+      final Map loginData = <String, dynamic>{
+        'name': name,
+        'phone': phone,
+        'address': address,
+        'username': username,
+        'password': password,
+      };
+      final response = await http.post(
+        Uri.parse(Apis.register),
+        body: loginData,
+      );
+      if (response.statusCode == 200) {
+        if (response.body.contains('succuss') && context.mounted) {
+          log('registration successfully completed');
+
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => const HomePage(),
+          ));
+        } else {
+          log('registration failed');
+        }
       } else {
-        log('registration failed');
+        result = {log(json.decode(response.body)["error"].toString())};
       }
-    } else {
-      result = {log(json.decode(response.body)["error"].toString())};
+      return result;
     }
-    return result;
-  }
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -240,15 +247,24 @@ class _RegistrationPageState extends State<RegistrationPage> {
                           ),
                           backgroundColor: mainColor,
                         ),
-                        onPressed: () {
+                        onPressed: () async {
                           if (formKey.currentState!.validate()) {
                             log('name = $name');
                             log('phone = $phone');
                             log('address = $address');
                             log('username = $username');
                             log('password = $password');
+                            register(
+                              name!,
+                              phone,
+                              address,
+                              username,
+                              password,
+                            );
+                            final pref = await SharedPreferences.getInstance();
+                            pref.setBool('isLoggedIn', true);
+                            pref.setString('username', username!);
                           }
-                          registration(name!, phone, address, username, password);
                         },
                         child: const Text(
                           'Register',
