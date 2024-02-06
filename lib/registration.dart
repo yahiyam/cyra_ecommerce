@@ -43,7 +43,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
         if (response.body.contains('success') && context.mounted) {
           log('registration successfully completed');
 
-          Navigator.of(context).push(MaterialPageRoute(
+          Navigator.of(context).pushReplacement(MaterialPageRoute(
             builder: (context) => const HomePage(),
           ));
         } else {

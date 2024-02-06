@@ -31,7 +31,7 @@ class _LoginPageState extends State<LoginPage> {
     final pref = await SharedPreferences.getInstance();
     bool isLoggedIn = pref.getBool('isLoggedIn') ?? false;
     if (isLoggedIn && context.mounted) {
-      Navigator.of(context).push(MaterialPageRoute(
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (context) => const HomePage(),
       ));
     }
@@ -51,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
       if (response.body.contains('success') && context.mounted) {
         pref?.setBool('isLoggedIn', true);
         pref?.setString('username', username);
-        Navigator.of(context).push(MaterialPageRoute(
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (context) => const HomePage(),
         ));
       } else {
