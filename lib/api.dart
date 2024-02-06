@@ -6,7 +6,7 @@ class Apis {
 // Method : POST
 
   static const String register =
-      "http://bootcamp.cyralearnings.com/registration.php(username,password)";
+      "http://bootcamp.cyralearnings.com/registration.php";
 // Arguments:
 // username
 // name

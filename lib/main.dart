@@ -1,8 +1,11 @@
 import 'package:cyra_ecommerce/constants.dart';
 import 'package:cyra_ecommerce/login.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  pref = await SharedPreferences.getInstance();
   runApp(const MyApp());
 }
 

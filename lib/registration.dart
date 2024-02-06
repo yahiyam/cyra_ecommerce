@@ -7,7 +7,6 @@ import 'package:cyra_ecommerce/login.dart';
 import 'package:cyra_ecommerce/pages/home.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({super.key});
@@ -17,10 +16,15 @@ class RegistrationPage extends StatefulWidget {
 }
 
 class _RegistrationPageState extends State<RegistrationPage> {
+  String? name, phone, address, username, password;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
-    String? name, phone, address, username, password;
-    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+    setPref() async {
+      pref?.setBool('isLoggedIn', true);
+      pref?.setString('username', username!);
+    }
 
     register(String name, phone, address, username, password) async {
       dynamic result;
@@ -36,7 +40,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
         body: loginData,
       );
       if (response.statusCode == 200) {
-        if (response.body.contains('succuss') && context.mounted) {
+        if (response.body.contains('success') && context.mounted) {
           log('registration successfully completed');
 
           Navigator.of(context).push(MaterialPageRoute(
@@ -60,13 +64,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
               'Register Account',
               style: TextStyle(
                 fontSize: 28,
+                color: mainColor,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const Text('Complete your details  \n'),
             const SizedBox(height: 20),
             Form(
-              key: formKey,
+              key: _formKey,
               child: Column(
                 children: [
                   Padding(
@@ -75,7 +80,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       height: 50,
                       width: MediaQuery.sizeOf(context).width,
                       decoration: const BoxDecoration(
-                          color: Color.fromARGB(255, 143, 141, 140),
+                          color: fieldColor,
                           borderRadius: BorderRadius.all(Radius.circular(10))),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -86,9 +91,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                               hintText: 'Name',
                             ),
                             onChanged: (value) {
-                              setState(() {
-                                name = value;
-                              });
+                              name = value;
                             },
                             validator: (value) {
                               if (value!.isEmpty) {
@@ -107,7 +110,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       height: 50,
                       width: MediaQuery.sizeOf(context).width,
                       decoration: const BoxDecoration(
-                          color: Color.fromARGB(255, 143, 141, 140),
+                          color: fieldColor,
                           borderRadius: BorderRadius.all(Radius.circular(10))),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -119,9 +122,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                             ),
                             keyboardType: TextInputType.phone,
                             onChanged: (value) {
-                              setState(() {
-                                phone = value;
-                              });
+                              phone = value;
                             },
                             validator: (value) {
                               if (value!.isEmpty) {
@@ -142,7 +143,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       height: 100,
                       width: MediaQuery.sizeOf(context).width,
                       decoration: const BoxDecoration(
-                          color: Color.fromARGB(255, 143, 141, 140),
+                          color: fieldColor,
                           borderRadius: BorderRadius.all(Radius.circular(10))),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -154,9 +155,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                               hintText: 'Address',
                             ),
                             onChanged: (value) {
-                              setState(() {
-                                address = value;
-                              });
+                              address = value;
                             },
                             validator: (value) {
                               if (value!.isEmpty) {
@@ -175,7 +174,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       height: 50,
                       width: MediaQuery.sizeOf(context).width,
                       decoration: const BoxDecoration(
-                          color: Color.fromARGB(255, 143, 141, 140),
+                          color: fieldColor,
                           borderRadius: BorderRadius.all(Radius.circular(10))),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -186,9 +185,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                               hintText: 'Username',
                             ),
                             onChanged: (value) {
-                              setState(() {
-                                username = value;
-                              });
+                              username = value;
                             },
                             validator: (value) {
                               if (value!.isEmpty) {
@@ -207,7 +204,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       height: 50,
                       width: MediaQuery.sizeOf(context).width,
                       decoration: const BoxDecoration(
-                          color: Color.fromARGB(255, 143, 141, 140),
+                          color: fieldColor,
                           borderRadius: BorderRadius.all(Radius.circular(10))),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -218,9 +215,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                               hintText: 'Password',
                             ),
                             onChanged: (value) {
-                              setState(() {
-                                password = value;
-                              });
+                              password = value;
                             },
                             validator: (value) {
                               if (value!.isEmpty) {
@@ -248,22 +243,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
                           backgroundColor: mainColor,
                         ),
                         onPressed: () async {
-                          if (formKey.currentState!.validate()) {
-                            log('name = $name');
-                            log('phone = $phone');
-                            log('address = $address');
-                            log('username = $username');
-                            log('password = $password');
+                          if (_formKey.currentState!.validate()) {
                             register(
                               name!,
                               phone,
                               address,
                               username,
                               password,
-                            );
-                            final pref = await SharedPreferences.getInstance();
-                            pref.setBool('isLoggedIn', true);
-                            pref.setString('username', username!);
+                            ).then((value) => setPref());
                           }
                         },
                         child: const Text(
@@ -286,7 +273,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(
+                          Navigator.of(context)
+                              .pushReplacement(MaterialPageRoute(
                             builder: (context) => const LoginPage(),
                           ));
                         },
