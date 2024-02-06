@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:cyra_ecommerce/constants.dart';
+import 'package:cyra_ecommerce/webservice/apis.dart';
 import 'package:cyra_ecommerce/webservice/web_service.dart';
 import 'package:cyra_ecommerce/widgets/drawer.dart';
 import 'package:flutter/material.dart';
@@ -93,7 +94,7 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 20),
             const Text(
-              'Most searched products',
+              'Offer products',
               style: TextStyle(
                 color: mainColor,
                 fontWeight: FontWeight.bold,
@@ -102,76 +103,89 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 10),
             Expanded(
-              child: StaggeredGridView.countBuilder(
-                crossAxisCount: 2,
-                shrinkWrap: true,
-                itemCount: 14,
-                physics: const BouncingScrollPhysics(),
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    onTap: () {
-                      log('clicked');
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Column(
-                          children: [
-                            ClipRRect(
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(15),
-                                topRight: Radius.circular(15),
+              child: FutureBuilder(
+                future: WebService().fetchOfferProduct(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return StaggeredGridView.countBuilder(
+                      crossAxisCount: 2,
+                      shrinkWrap: true,
+                      itemCount: snapshot.data!.length,
+                      physics: const BouncingScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        final offerProduct = snapshot.data![index];
+                        return InkWell(
+                          onTap: () {
+                            log('clicked');
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(15),
                               ),
-                              child: Container(
-                                constraints: const BoxConstraints(
-                                  minHeight: 100,
-                                  maxHeight: 250,
-                                ),
-                                child: const Image(
-                                  image: NetworkImage(networkImage),
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8),
                               child: Column(
                                 children: [
-                                  Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Text(
-                                      "Shoes",
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        color: Colors.grey.shade600,
+                                  ClipRRect(
+                                    borderRadius: const BorderRadius.only(
+                                      topLeft: Radius.circular(15),
+                                      topRight: Radius.circular(15),
+                                    ),
+                                    child: Container(
+                                      constraints: const BoxConstraints(
+                                        minHeight: 100,
+                                        maxHeight: 250,
+                                      ),
+                                      child: Image(
+                                        image: NetworkImage(
+                                          '${Apis.mainUrl}products/${offerProduct.image}',
+                                        ),
                                       ),
                                     ),
                                   ),
-                                  const Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Text(
-                                      'Rs. 2000',
-                                      style: TextStyle(
-                                        color: Colors.redAccent,
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8),
+                                    child: Column(
+                                      children: [
+                                        Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                            offerProduct.productname!,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              color: Colors.grey.shade600,
+                                            ),
+                                          ),
+                                        ),
+                                        Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                            'Rs. ${offerProduct.price!}',
+                                            style: const TextStyle(
+                                              color: Colors.redAccent,
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
+                          ),
+                        );
+                      },
+                      staggeredTileBuilder: (index) =>
+                          const StaggeredTile.fit(1),
+                    );
+                  } else {
+                    return const Center(child: CircularProgressIndicator());
+                  }
                 },
-                staggeredTileBuilder: (index) => const StaggeredTile.fit(1),
               ),
             ),
           ],
