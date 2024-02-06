@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:cyra_ecommerce/constants.dart';
+import 'package:cyra_ecommerce/webservice/web_service.dart';
 import 'package:cyra_ecommerce/widgets/drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:staggered_grid_view_flutter/widgets/staggered_grid_view.dart';
@@ -47,39 +48,48 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const SizedBox(height: 10),
-            SizedBox(
-              height: 100,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: 12,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: InkWell(
-                      onTap: () {
-                        log('clicked');
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(15),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: mainColor.withAlpha(100),
-                        ),
-                        child: const Center(
-                          child: Text(
-                            'Category Name',
-                            style: TextStyle(
-                              color: mainColor,
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
+            FutureBuilder(
+              future: WebService().fetchCategory(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return SizedBox(
+                    height: 70,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: InkWell(
+                            onTap: () {
+                              log('clicked');
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(15),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: mainColor.withAlpha(100),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  snapshot.data![index].category!,
+                                  style: const TextStyle(
+                                    color: mainColor,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
+                        );
+                      },
                     ),
                   );
-                },
-              ),
+                } else {
+                  return const Center(child: CircularProgressIndicator());
+                }
+              },
             ),
             const SizedBox(height: 20),
             const Text(

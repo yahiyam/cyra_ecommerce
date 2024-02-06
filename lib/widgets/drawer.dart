@@ -36,7 +36,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               leading: const Icon(Icons.home),
               title: const Text(
                 'Home',
-                style: TextStyle(fontSize: 35),
+                style: TextStyle(fontSize: 16),
               ),
               trailing: const Icon(
                 Icons.arrow_forward_ios,
@@ -50,7 +50,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               leading: const Icon(Icons.shopping_bag_rounded),
               title: const Text(
                 'Cart Page',
-                style: TextStyle(fontSize: 35),
+                style: TextStyle(fontSize: 16),
               ),
               trailing: const Icon(
                 Icons.arrow_forward_ios,
@@ -64,7 +64,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               leading: const Icon(Icons.book),
               title: const Text(
                 'Order Details',
-                style: TextStyle(fontSize: 35),
+                style: TextStyle(fontSize: 16),
               ),
               trailing: const Icon(
                 Icons.arrow_forward_ios,
@@ -81,7 +81,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               ),
               title: const Text(
                 'Log out',
-                style: TextStyle(fontSize: 35),
+                style: TextStyle(fontSize: 16),
               ),
               trailing: const Icon(
                 Icons.arrow_forward_ios,
