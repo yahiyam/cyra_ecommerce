@@ -1,5 +1,4 @@
-import 'dart:developer';
-
+import 'package:cyra_ecommerce/pages/product_detail.dart';
 import 'package:cyra_ecommerce/webservice/apis.dart';
 import 'package:cyra_ecommerce/webservice/web_service.dart';
 import 'package:flutter/material.dart';
@@ -54,7 +53,9 @@ class _CategoryProductPageState extends State<CategoryProductPage> {
                 final product = snapshot.data![index];
                 return InkWell(
                   onTap: () {
-                    log('clicked');
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => ProductDetailPage(product: product),
+                    ));
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(8),

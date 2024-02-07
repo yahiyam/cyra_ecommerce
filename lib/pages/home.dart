@@ -1,7 +1,6 @@
-import 'dart:developer';
-
 import 'package:cyra_ecommerce/constants.dart';
 import 'package:cyra_ecommerce/pages/category_product.dart';
+import 'package:cyra_ecommerce/pages/product_detail.dart';
 import 'package:cyra_ecommerce/webservice/apis.dart';
 import 'package:cyra_ecommerce/webservice/web_service.dart';
 import 'package:cyra_ecommerce/widgets/drawer.dart';
@@ -66,7 +65,7 @@ class _HomePageState extends State<HomePage> {
                           child: InkWell(
                             onTap: () {
                               Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) =>  CategoryProductPage(
+                                builder: (context) => CategoryProductPage(
                                   catName: category.category!,
                                   catId: category.id!,
                                 ),
@@ -123,7 +122,10 @@ class _HomePageState extends State<HomePage> {
                         final offerProduct = snapshot.data![index];
                         return InkWell(
                           onTap: () {
-                            log('clicked');
+                            Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) =>
+                                  ProductDetailPage(product: offerProduct),
+                            ));
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(8),

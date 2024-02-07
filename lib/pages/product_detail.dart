@@ -1,14 +1,16 @@
 import 'package:cyra_ecommerce/constants.dart';
+import 'package:cyra_ecommerce/models/product.dart';
+import 'package:cyra_ecommerce/webservice/apis.dart';
 import 'package:flutter/material.dart';
 
-class ProdectDetailPage extends StatefulWidget {
-  const ProdectDetailPage({super.key});
-
+class ProductDetailPage extends StatefulWidget {
+  const ProductDetailPage({super.key, required this.product});
+  final ProductModel product;
   @override
-  State<ProdectDetailPage> createState() => _ProdectDetailPageState();
+  State<ProductDetailPage> createState() => _ProductDetailPageState();
 }
 
-class _ProdectDetailPageState extends State<ProdectDetailPage> {
+class _ProductDetailPageState extends State<ProductDetailPage> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -22,8 +24,10 @@ class _ProdectDetailPageState extends State<ProdectDetailPage> {
                     height: MediaQuery.sizeOf(context).height * .8,
                     color: Colors.white,
                     width: double.infinity,
-                    child: const Image(
-                      image: NetworkImage(networkImage),
+                    child: Image(
+                      image: NetworkImage(
+                        '${Apis.mainUrl}/products${widget.product.image!}',
+                      ),
                     ),
                   ),
                   Positioned(
@@ -48,7 +52,7 @@ class _ProdectDetailPageState extends State<ProdectDetailPage> {
                 padding: const EdgeInsets.only(top: 20),
                 width: double.infinity,
                 decoration: const BoxDecoration(
-                  color: Colors.amber,
+                  color: Colors.white,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(40),
                     topRight: Radius.circular(40),
@@ -62,7 +66,7 @@ class _ProdectDetailPageState extends State<ProdectDetailPage> {
                       Padding(
                         padding: const EdgeInsets.only(top: 10),
                         child: Text(
-                          'Shoes',
+                          widget.product.productname!,
                           style: TextStyle(
                             color: Colors.grey.shade600,
                             fontSize: 22,
@@ -71,7 +75,7 @@ class _ProdectDetailPageState extends State<ProdectDetailPage> {
                         ),
                       ),
                       Text(
-                        'Rs 1000',
+                        'Rs ${widget.product.price.toString()}',
                         style: TextStyle(
                           color: Colors.red.shade600,
                           fontSize: 16,
@@ -79,11 +83,11 @@ class _ProdectDetailPageState extends State<ProdectDetailPage> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      const Text(
-                        'description',
+                      Text(
+                        widget.product.description!,
                         textAlign: TextAlign.start,
                         textScaleFactor: 1.1,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.black,
                           fontSize: 15,
                           fontWeight: FontWeight.w400,
