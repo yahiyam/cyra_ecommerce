@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:cyra_ecommerce/constants.dart';
+import 'package:cyra_ecommerce/pages/category_product.dart';
 import 'package:cyra_ecommerce/webservice/apis.dart';
 import 'package:cyra_ecommerce/webservice/web_service.dart';
 import 'package:cyra_ecommerce/widgets/drawer.dart';
@@ -63,7 +64,10 @@ class _HomePageState extends State<HomePage> {
                           padding: const EdgeInsets.all(8),
                           child: InkWell(
                             onTap: () {
-                              log('clicked');
+                              Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) =>
+                                    const CategoryProductPage(),
+                              ));
                             },
                             child: Container(
                               padding: const EdgeInsets.all(15),
