@@ -60,13 +60,16 @@ class _HomePageState extends State<HomePage> {
                       scrollDirection: Axis.horizontal,
                       itemCount: snapshot.data!.length,
                       itemBuilder: (context, index) {
+                        final category = snapshot.data![index];
                         return Padding(
                           padding: const EdgeInsets.all(8),
                           child: InkWell(
                             onTap: () {
                               Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) =>
-                                    const CategoryProductPage(),
+                                builder: (context) =>  CategoryProductPage(
+                                  catName: category.category!,
+                                  catId: category.id!,
+                                ),
                               ));
                             },
                             child: Container(
@@ -77,7 +80,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                               child: Center(
                                 child: Text(
-                                  snapshot.data![index].category!,
+                                  category.category!,
                                   style: const TextStyle(
                                     color: mainColor,
                                     fontSize: 15,

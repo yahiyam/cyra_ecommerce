@@ -1,12 +1,19 @@
 import 'dart:developer';
 
-import 'package:cyra_ecommerce/constants.dart';
+import 'package:cyra_ecommerce/webservice/apis.dart';
+import 'package:cyra_ecommerce/webservice/web_service.dart';
 import 'package:flutter/material.dart';
 import 'package:staggered_grid_view_flutter/widgets/staggered_grid_view.dart';
 import 'package:staggered_grid_view_flutter/widgets/staggered_tile.dart';
 
 class CategoryProductPage extends StatefulWidget {
-  const CategoryProductPage({super.key});
+  const CategoryProductPage({
+    super.key,
+    required this.catName,
+    required this.catId,
+  });
+  final String catName;
+  final int catId;
 
   @override
   State<CategoryProductPage> createState() => _CategoryProductPageState();
@@ -29,83 +36,93 @@ class _CategoryProductPageState extends State<CategoryProductPage> {
             color: Colors.black,
           ),
         ),
-        title: const Text(
-          'Category Name',
-          style: TextStyle(fontSize: 20),
+        title: Text(
+          widget.catName,
+          style: const TextStyle(fontSize: 20),
         ),
       ),
-      body: StaggeredGridView.countBuilder(
-        physics: const BouncingScrollPhysics(),
-        shrinkWrap: true,
-        crossAxisCount: 2,
-        itemCount: 2,
-        itemBuilder: (context, index) {
-          return InkWell(
-            onTap: () {
-              log('clicked');
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(8),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Column(
-                  children: [
-                    ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(15),
-                        topRight: Radius.circular(15),
+      body: FutureBuilder(
+        future: WebService().fetchCategoryProduct(widget.catId),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return StaggeredGridView.countBuilder(
+              physics: const BouncingScrollPhysics(),
+              shrinkWrap: true,
+              crossAxisCount: 2,
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                final product = snapshot.data![index];
+                return InkWell(
+                  onTap: () {
+                    log('clicked');
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
                       ),
-                      child: Container(
-                        constraints: const BoxConstraints(
-                          minHeight: 100,
-                          maxHeight: 250,
-                        ),
-                        child: const Image(
-                          image: NetworkImage(
-                            networkImage,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8),
                       child: Column(
                         children: [
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              'offerProduct.productname!',
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: Colors.grey.shade600,
+                          ClipRRect(
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(15),
+                              topRight: Radius.circular(15),
+                            ),
+                            child: Container(
+                              constraints: const BoxConstraints(
+                                minHeight: 100,
+                                maxHeight: 250,
+                              ),
+                              child: Image(
+                                image: NetworkImage(
+                                  '${Apis.mainUrl}/products${product.image!}',
+                                ),
                               ),
                             ),
                           ),
-                          const Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              'Rs." {offerProduct.price!}',
-                              style: TextStyle(
-                                color: Colors.redAccent,
-                                fontSize: 17,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Column(
+                              children: [
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    product.productname!,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: Colors.grey.shade600,
+                                    ),
+                                  ),
+                                ),
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    'Rs. ${product.price!}',
+                                    style: const TextStyle(
+                                      color: Colors.redAccent,
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ),
-          );
+                  ),
+                );
+              },
+              staggeredTileBuilder: (index) => const StaggeredTile.fit(1),
+            );
+          } else {
+            return const Center(child: CircularProgressIndicator());
+          }
         },
-        staggeredTileBuilder: (index) => const StaggeredTile.fit(1),
       ),
     );
   }

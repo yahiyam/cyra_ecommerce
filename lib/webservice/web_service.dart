@@ -46,4 +46,25 @@ class WebService {
       return [];
     }
   }
+
+  Future<List<ProductModel>> fetchCategoryProduct(int catId) async {
+    try {
+      final response = await http.post(
+        Uri.parse(Apis.getCategoryProducts),
+        body: {"catid": catId.toString()},
+      );
+      if (response.statusCode == 200) {
+        final productJson = json.decode(response.body);
+        return productJson
+            .map<ProductModel>((json) => ProductModel.fromJson(json))
+            .toList();
+      } else {
+        log('API request failed with status code: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      log('Error fetching Category products: $e');
+      return [];
+    }
+  }
 }
