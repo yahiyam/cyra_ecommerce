@@ -21,12 +21,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               Stack(
                 children: [
                   Container(
-                    height: MediaQuery.sizeOf(context).height * .8,
+                    height: MediaQuery.sizeOf(context).height * .6,
                     color: Colors.white,
                     width: double.infinity,
                     child: Image(
                       image: NetworkImage(
-                        '${Apis.mainUrl}/products${widget.product.image!}',
+                        '${Apis.mainUrl}products/${widget.product.image!}',
                       ),
                     ),
                   ),
@@ -102,7 +102,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           ),
         ),
         bottomSheet: Padding(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(16),
           child: Container(
             height: 50,
             width: MediaQuery.sizeOf(context).width,
@@ -110,11 +110,13 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               borderRadius: BorderRadius.circular(20),
               color: mainColor,
             ),
-            child: const Text(
-              'Add to Cart',
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.white,
+            child: const Center(
+              child: Text(
+                'Add to Cart',
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.white,
+                ),
               ),
             ),
           ),

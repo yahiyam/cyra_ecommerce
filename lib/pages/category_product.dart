@@ -78,7 +78,7 @@ class _CategoryProductPageState extends State<CategoryProductPage> {
                               ),
                               child: Image(
                                 image: NetworkImage(
-                                  '${Apis.mainUrl}/products${product.image!}',
+                                  '${Apis.mainUrl}products/${product.image!}',
                                 ),
                               ),
                             ),
