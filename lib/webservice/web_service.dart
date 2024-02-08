@@ -82,12 +82,11 @@ class WebService {
             .map<OrderModel>((json) => OrderModel.fromJson(json))
             .toList();
       } else {
-        log('API request failed with status code: ${response.statusCode}');
-        return [];
+        throw Exception(
+            'API request failed with status code: ${response.statusCode}');
       }
     } catch (e) {
-      log('Error fetching Order products: $e');
-      return [];
+      throw Exception('Error fetching Order products: $e');
     }
   }
 

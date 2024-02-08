@@ -45,10 +45,10 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
         ),
       ),
       body: FutureBuilder(
-          future: WebService().fetchOrderDetails(username!),
+          future: WebService().fetchOrderDetails(username.toString()),
           builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              final orders = snapshot.data!;
+            final orders = snapshot.data ?? [];
+            if (snapshot.hasData && orders.isNotEmpty) {
               return ListView.builder(
                 itemCount: orders.length,
                 shrinkWrap: true,
