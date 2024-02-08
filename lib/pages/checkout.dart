@@ -1,8 +1,16 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:cyra_ecommerce/constants.dart';
 import 'package:cyra_ecommerce/models/cart.dart';
+import 'package:cyra_ecommerce/models/user.dart';
+import 'package:cyra_ecommerce/pages/home.dart';
+import 'package:cyra_ecommerce/provider/cart.dart';
+import 'package:cyra_ecommerce/webservice/apis.dart';
+import 'package:cyra_ecommerce/webservice/web_service.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class CheckoutPage extends StatefulWidget {
   final List<CartModel> cartList;
@@ -31,8 +39,65 @@ class _CheckoutPageState extends State<CheckoutPage> {
   String? name, address, phone;
   String? paymentMethod = 'Cash on delivery';
 
+  placeOrder(
+    List<CartModel> cart,
+    String amount,
+    String paymentMethod,
+    String date,
+    String name,
+    String address,
+    String phone,
+  ) async {
+    String jsonData = jsonEncode(cart);
+    final vm = Provider.of<CartProvider>(context, listen: false);
+    final response = await http.post(
+      Uri.parse(Apis.order),
+      body: {
+        'username': username,
+        'amount': amount,
+        "paymentmethod": paymentMethod,
+        'date': date,
+        "quantity": vm.count.toString(),
+        "cart": jsonData,
+        'name': name,
+        'address': address,
+        'phone': phone,
+      },
+    );
+    if (response.statusCode == 200) {
+      if (response.body.contains('Success') && context.mounted) {
+        vm.clearCart();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            padding: EdgeInsets.all(15),
+            behavior: SnackBarBehavior.floating,
+            duration: Duration(seconds: 2),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(15),
+              ),
+            ),
+            content: Text(
+              'Your order successfully placed',
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        );
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (context) => const HomePage(),
+            ),
+            (route) => false);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final vm = Provider.of<CartProvider>(context, listen: false);
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
@@ -54,78 +119,91 @@ class _CheckoutPageState extends State<CheckoutPage> {
           children: [
             Padding(
               padding: const EdgeInsets.all(8),
-              child: Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Column(
-                  children: [
-                    const Row(
-                      children: [
-                        Text(
-                          'Name : ',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
+              child: FutureBuilder<UserModel>(
+                future: WebService().fetchUser(username.toString()),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    name = snapshot.data!.name;
+                    phone = snapshot.data!.phone;
+                    address = snapshot.data!.address;
+                    return Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              const Text(
+                                'Name : ',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                name.toString(),
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                        Text(
-                          'yahiya',
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              const Text(
+                                'Phone : ',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                phone.toString(),
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    const Row(
-                      children: [
-                        Text(
-                          'Phone : ',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              const Text(
+                                'Address : ',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(
+                                width: MediaQuery.sizeOf(context).width / 1.5,
+                                child: Text(
+                                  address!,
+                                  maxLines: 4,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                        Text(
-                          '123456789',
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        const Text(
-                          'Address : ',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(
-                          width: MediaQuery.sizeOf(context).width / 1.5,
-                          child: const Text(
-                            'tanur',
-                            maxLines: 4,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                  ],
-                ),
+                          const SizedBox(height: 10),
+                        ],
+                      ),
+                    );
+                  } else {
+                    return const Center(
+                        child: CircularProgressIndicator(color: mainColor));
+                  }
+                },
               ),
             ),
             const SizedBox(height: 10),
@@ -164,6 +242,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
           onTap: () {
             String dartTime = DateTime.now().toString();
             log(dartTime);
+            placeOrder(widget.cartList, vm.totalPrice.toString(),
+                paymentMethod!, dartTime, name!, address!, phone!);
           },
           child: Container(
             height: 50,
