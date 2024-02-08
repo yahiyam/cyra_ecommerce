@@ -1,6 +1,7 @@
 import 'package:cyra_ecommerce/constants.dart';
 import 'package:cyra_ecommerce/login.dart';
 import 'package:cyra_ecommerce/pages/cart.dart';
+import 'package:cyra_ecommerce/pages/order_details.dart';
 import 'package:cyra_ecommerce/provider/cart.dart';
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as badge;
@@ -94,6 +95,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
               ),
               onTap: () {
                 Navigator.pop(context);
+                 Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const OrderDetailsPage(),
+                ));
               },
             ),
             ListTile(
