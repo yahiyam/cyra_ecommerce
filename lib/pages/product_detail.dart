@@ -1,16 +1,14 @@
 import 'package:cyra_ecommerce/constants.dart';
 import 'package:cyra_ecommerce/models/product.dart';
+import 'package:cyra_ecommerce/provider/cart.dart';
 import 'package:cyra_ecommerce/webservice/apis.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:collection/collection.dart';
 
-class ProductDetailPage extends StatefulWidget {
+class ProductDetailPage extends StatelessWidget {
   const ProductDetailPage({super.key, required this.product});
   final ProductModel product;
-  @override
-  State<ProductDetailPage> createState() => _ProductDetailPageState();
-}
-
-class _ProductDetailPageState extends State<ProductDetailPage> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -26,7 +24,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     width: double.infinity,
                     child: Image(
                       image: NetworkImage(
-                        '${Apis.mainUrl}products/${widget.product.image!}',
+                        '${Apis.mainUrl}products/${product.image!}',
                       ),
                     ),
                   ),
@@ -66,7 +64,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       Padding(
                         padding: const EdgeInsets.only(top: 10),
                         child: Text(
-                          widget.product.productname!,
+                          product.productname!,
                           style: TextStyle(
                             color: Colors.grey.shade600,
                             fontSize: 22,
@@ -75,7 +73,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         ),
                       ),
                       Text(
-                        'Rs ${widget.product.price.toString()}',
+                        'Rs ${product.price.toString()}',
                         style: TextStyle(
                           color: Colors.red.shade600,
                           fontSize: 16,
@@ -84,7 +82,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       ),
                       const SizedBox(height: 20),
                       Text(
-                        widget.product.description!,
+                        product.description!,
                         textAlign: TextAlign.start,
                         textScaleFactor: 1.1,
                         style: const TextStyle(
@@ -103,19 +101,74 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         ),
         bottomSheet: Padding(
           padding: const EdgeInsets.all(16),
-          child: Container(
-            height: 50,
-            width: MediaQuery.sizeOf(context).width,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: mainColor,
-            ),
-            child: const Center(
-              child: Text(
-                'Add to Cart',
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.white,
+          child: InkWell(
+            onTap: () {
+              var existingItemCart = context
+                  .read<CartProvider>()
+                  .cartItems
+                  .firstWhereOrNull((element) => element.id == product.id!);
+
+              if (existingItemCart != null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    padding: EdgeInsets.all(15),
+                    behavior: SnackBarBehavior.floating,
+                    duration: Duration(seconds: 2),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(15),
+                      ),
+                    ),
+                    content: Text(
+                      'Already in Cart !!!',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                );
+              } else {
+                context.read<CartProvider>().addItem(
+                      product.id!,
+                      product.productname!,
+                      product.price!,
+                      1,
+                      '${Apis.mainUrl}products/${product.image}',
+                    );
+                const SnackBar(
+                  padding: EdgeInsets.all(15),
+                  behavior: SnackBarBehavior.floating,
+                  duration: Duration(seconds: 2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(15),
+                    ),
+                  ),
+                  content: Text(
+                    'Added to Cart !!!',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                    ),
+                  ),
+                );
+              }
+            },
+            child: Container(
+              height: 50,
+              width: MediaQuery.sizeOf(context).width,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: mainColor,
+              ),
+              child: const Center(
+                child: Text(
+                  'Add to Cart',
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
