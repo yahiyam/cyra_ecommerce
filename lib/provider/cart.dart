@@ -18,7 +18,7 @@ class CartProvider extends ChangeNotifier {
     int id,
     String name,
     double price,
-    double qty,
+    int qty,
     String image,
   ) {
     final product = CartModel(

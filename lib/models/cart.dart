@@ -2,7 +2,7 @@ class CartModel {
   int? id;
   String? name;
   double price;
-  double qty;
+  int qty;
   String? image;
 
   CartModel({

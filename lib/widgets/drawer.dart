@@ -1,6 +1,10 @@
 import 'package:cyra_ecommerce/constants.dart';
 import 'package:cyra_ecommerce/login.dart';
+import 'package:cyra_ecommerce/pages/cart.dart';
+import 'package:cyra_ecommerce/provider/cart.dart';
 import 'package:flutter/material.dart';
+import 'package:badges/badges.dart' as badge;
+import 'package:provider/provider.dart';
 
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({super.key});
@@ -47,7 +51,22 @@ class _CustomDrawerState extends State<CustomDrawer> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.shopping_bag_rounded),
+              leading: badge.Badge(
+                showBadge: context.read<CartProvider>().cartItems.isEmpty
+                    ? false
+                    : true,
+                badgeAnimation: const badge.BadgeAnimation.fade(),
+                badgeStyle: const badge.BadgeStyle(badgeColor: Colors.red),
+                badgeContent: Text(
+                  context.read<CartProvider>().cartItems.length.toString(),
+                  style: const TextStyle(
+                    fontSize: 10,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                child: const Icon(Icons.shopping_bag_rounded),
+              ),
               title: const Text(
                 'Cart Page',
                 style: TextStyle(fontSize: 16),
@@ -58,6 +77,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
               ),
               onTap: () {
                 Navigator.pop(context);
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const CartPage(),
+                ));
               },
             ),
             ListTile(
