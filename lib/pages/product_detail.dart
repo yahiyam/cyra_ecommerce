@@ -136,20 +136,22 @@ class ProductDetailPage extends StatelessWidget {
                       1,
                       '${Apis.mainUrl}products/${product.image}',
                     );
-                const SnackBar(
-                  padding: EdgeInsets.all(15),
-                  behavior: SnackBarBehavior.floating,
-                  duration: Duration(seconds: 2),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(15),
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    padding: EdgeInsets.all(15),
+                    behavior: SnackBarBehavior.floating,
+                    duration: Duration(seconds: 2),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(15),
+                      ),
                     ),
-                  ),
-                  content: Text(
-                    'Added to Cart !!!',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white,
+                    content: Text(
+                      'Added to Cart !!!',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 );

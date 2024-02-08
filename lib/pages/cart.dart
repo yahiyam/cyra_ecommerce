@@ -1,3 +1,5 @@
+import 'package:cyra_ecommerce/constants.dart';
+import 'package:cyra_ecommerce/pages/checkout.dart';
 import 'package:cyra_ecommerce/provider/cart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -134,7 +136,7 @@ class _CartPageState extends State<CartPage> {
                                                         size: 16,
                                                       )
                                                     : const Icon(
-                                                        Icons.minimize_rounded,
+                                                        Icons.remove,
                                                         size: 18,
                                                       ),
                                               ),
@@ -188,12 +190,41 @@ class _CartPageState extends State<CartPage> {
               ),
             ),
             InkWell(
-              onTap: () {},
+              onTap: () {
+                context.read<CartProvider>().cartItems.isEmpty
+                    ? ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          padding: EdgeInsets.all(15),
+                          behavior: SnackBarBehavior.floating,
+                          duration: Duration(seconds: 2),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(15),
+                            ),
+                          ),
+                          content: Text(
+                            'Cart is empty !!!',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      )
+                    : Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => CheckoutPage(
+                            cartList: context.watch<CartProvider>().cartItems,
+                          ),
+                        ),
+                      );
+              },
               child: Container(
                 height: 50,
                 width: MediaQuery.sizeOf(context).width / 2.2,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
+                  color: mainColor,
                 ),
                 child: const Center(
                   child: Text(
