@@ -26,11 +26,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   @override
   void initState() {
-    _lodUsername();
+    _loadUsername();
     super.initState();
   }
 
-  void _lodUsername() async {
+  void _loadUsername() async {
     setState(() {
       username = pref!.getString('username');
     });

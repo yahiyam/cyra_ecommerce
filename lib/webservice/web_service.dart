@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:cyra_ecommerce/models/category.dart';
+import 'package:cyra_ecommerce/models/order.dart';
 import 'package:cyra_ecommerce/models/product.dart';
 import 'package:cyra_ecommerce/models/user.dart';
 import 'package:cyra_ecommerce/webservice/apis.dart';
@@ -69,7 +70,7 @@ class WebService {
     }
   }
 
-  Future<List<UserModel>> fetchOrderDetails(String username) async {
+  Future<List<OrderModel>> fetchOrderDetails(String username) async {
     try {
       final response = await http.post(
         Uri.parse(Apis.getOrderDetails),
@@ -78,7 +79,7 @@ class WebService {
       if (response.statusCode == 200) {
         final productJson = json.decode(response.body);
         return productJson
-            .map<ProductModel>((json) => ProductModel.fromJson(json))
+            .map<OrderModel>((json) => OrderModel.fromJson(json))
             .toList();
       } else {
         log('API request failed with status code: ${response.statusCode}');

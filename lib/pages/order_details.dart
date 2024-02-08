@@ -1,5 +1,8 @@
 import 'package:cyra_ecommerce/constants.dart';
+import 'package:cyra_ecommerce/webservice/apis.dart';
+import 'package:cyra_ecommerce/webservice/web_service.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class OrderDetailsPage extends StatefulWidget {
   const OrderDetailsPage({super.key});
@@ -9,6 +12,20 @@ class OrderDetailsPage extends StatefulWidget {
 }
 
 class _OrderDetailsPageState extends State<OrderDetailsPage> {
+  String? username;
+
+  @override
+  void initState() {
+    _loadUsername();
+    super.initState();
+  }
+
+  void _loadUsername() async {
+    setState(() {
+      username = pref!.getString('username');
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,150 +44,171 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
           style: TextStyle(fontSize: 25),
         ),
       ),
-      body: ListView.builder(
-        itemCount: 2,
-        shrinkWrap: true,
-        physics: const BouncingScrollPhysics(),
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.all(10),
-            child: Card(
-              elevation: 0,
-              color: const Color.fromARGB(15, 74, 20, 140),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
-              child: ExpansionTile(
-                trailing: const Icon(Icons.arrow_drop_down_rounded),
-                textColor: Colors.black,
-                collapsedTextColor: Colors.black,
-                iconColor: Colors.red,
-                title: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'date',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    Text(
-                      'online',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.green.shade900,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    Text(
-                      '2000/-',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.red.shade900,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-                children: [
-                  ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding: const EdgeInsets.only(top: 20),
-                    itemCount: 3,
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: 5),
-                    itemBuilder: (context, index) {
-                      return Card(
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(20),
-                          ),
+      body: FutureBuilder(
+          future: WebService().fetchOrderDetails(username!),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              final orders = snapshot.data!;
+              return ListView.builder(
+                itemCount: orders.length,
+                shrinkWrap: true,
+                physics: const BouncingScrollPhysics(),
+                itemBuilder: (context, index) {
+                  final order = orders[index];
+                  return Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Card(
+                      elevation: 0,
+                      color: const Color.fromARGB(15, 74, 20, 140),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      child: ExpansionTile(
+                        trailing: const Icon(Icons.arrow_drop_down_rounded),
+                        textColor: Colors.black,
+                        collapsedTextColor: Colors.black,
+                        iconColor: Colors.red,
+                        title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              DateFormat.yMMMEd().format(order.date!),
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Text(
+                              order.paymentmethod.toString(),
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.green.shade900,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Text(
+                              'Rs ${order.totalamount}/-',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.red.shade900,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
                         ),
-                        child: SizedBox(
-                          height: 100,
-                          child: Row(
-                            children: [
-                              SizedBox(
-                                height: 80,
-                                width: 100,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 9),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
-                                      image: const DecorationImage(
-                                        image: NetworkImage(networkImage),
-                                        fit: BoxFit.fill,
-                                      ),
-                                    ),
+                        children: [
+                          ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            padding: const EdgeInsets.only(top: 20),
+                            itemCount: order.products!.length,
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 5),
+                            itemBuilder: (context, index) {
+                              return Card(
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(20),
                                   ),
                                 ),
-                              ),
-                              Flexible(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8),
-                                  child: Wrap(
+                                child: SizedBox(
+                                  height: 100,
+                                  child: Row(
                                     children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(8),
-                                        child: Text(
-                                          'product.name!',
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.grey.shade700,
+                                      SizedBox(
+                                        height: 80,
+                                        width: 100,
+                                        child: Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 9),
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              image: DecorationImage(
+                                                image: NetworkImage(
+                                                  '${Apis.mainUrl}products/${order.products![index].image!}',
+                                                ),
+                                                fit: BoxFit.contain,
+                                              ),
+                                            ),
                                           ),
                                         ),
                                       ),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 8.0,right: 8),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              'Rs 222',
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.red.shade900,
+                                      Flexible(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8),
+                                          child: Wrap(
+                                            children: [
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8),
+                                                child: Text(
+                                                  order.products![index]
+                                                      .productname!,
+                                                  maxLines: 2,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: Colors.grey.shade700,
+                                                  ),
+                                                ),
                                               ),
-                                            ),
-                                            const Text(
-                                              'x 2',
-                                              style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black,
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 8.0, right: 8),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      'Rs ${order.products![index].price!}',
+                                                      style: TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color:
+                                                            Colors.red.shade900,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      'x ${order.products![index].quantity!}',
+                                                      style: const TextStyle(
+                                                        fontSize: 20,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.black,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  )
-                ],
-              ),
-            ),
-          );
-        },
-      ),
+                              );
+                            },
+                          )
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+            } else {
+              return const Center(child: Text('No orders yet'));
+            }
+          }),
     );
   }
 }
