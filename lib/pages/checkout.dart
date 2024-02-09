@@ -1,10 +1,10 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:cyra_ecommerce/constants.dart';
 import 'package:cyra_ecommerce/models/cart.dart';
 import 'package:cyra_ecommerce/models/user.dart';
 import 'package:cyra_ecommerce/pages/home.dart';
+import 'package:cyra_ecommerce/pages/payment.dart';
 import 'package:cyra_ecommerce/provider/cart.dart';
 import 'package:cyra_ecommerce/webservice/apis.dart';
 import 'package:cyra_ecommerce/webservice/web_service.dart';
@@ -240,10 +240,25 @@ class _CheckoutPageState extends State<CheckoutPage> {
         padding: const EdgeInsets.all(16),
         child: InkWell(
           onTap: () {
-            String dartTime = DateTime.now().toString();
-            log(dartTime);
-            placeOrder(widget.cartList, vm.totalPrice.toString(),
-                paymentMethod!, dartTime, name!, address!, phone!);
+            String dateTime = DateTime.now().toString();
+
+            if (paymentMethod == "Online") {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => PaymentPage(
+                  cart: widget.cartList,
+                  amount: vm.totalPrice.toString(),
+                  paymentMethod: paymentMethod!,
+                  date: dateTime,
+                  name: name!,
+                  address: address!,
+                  phone: phone!,
+                  username: username!,
+                ),
+              ));
+            } else if (paymentMethod == 'Cash on delivery') {
+              placeOrder(widget.cartList, vm.totalPrice.toString(),
+                  paymentMethod!, dateTime, name!, address!, phone!);
+            }
           },
           child: Container(
             height: 50,
